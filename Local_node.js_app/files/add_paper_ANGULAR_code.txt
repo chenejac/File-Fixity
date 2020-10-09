@@ -1,0 +1,7 @@
+send file
+sendPaper(relativeUrl: string, file: any, data: any) {
+    const fd = new FormData();
+    fd.append('scientific_paper_file', file);
+    fd.append('scientific_paper_data', new Blob([JSON.stringify(data)], {type: 'application/json'}));
+    return this.http.post(this.baseUrl + relativeUrl, fd);
+  }

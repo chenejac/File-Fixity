@@ -1,0 +1,7 @@
+{
+    "CentralServer": {
+        "myPath": "C:/Users/marko/nodeJs/resolve",
+        "dirSizeGb": 2,
+        "ftpServerUrl": "ftp://0.0.0.0:21"
+    }
+}

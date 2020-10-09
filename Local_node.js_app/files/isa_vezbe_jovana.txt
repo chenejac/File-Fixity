@@ -1,0 +1,387 @@
+----- ISA ----
+---- 1. vezbe ---
+TARGETI DEFINISU CILJEVE, I REDOSLED IZVRSAVANJA TIH CILJEVA 
+UNUTAR TRAGA SU TASKOVI
+${NAZIV_KLUJCA} - ZA PRISTUP PROPERTY-IMA
+-----------------------------
+---- 2. vezbe ---
+SPRING
+-servisi su interface-i
+-klase moramo proglasiti komponentom:
+	1. anotacijom Component, Service, ControlLer ...
+-dependence - za povezivanje komponenti
+	1. konstruktor
+	2. polje (atribut) - ne bi trebalo da se radi, komplikovano ako ima puno atributa 
+	3. kroz seter 
+	- Autowired anotacija se stavlja nezavisno od toga na koji nacin je implementirano (1-3)
+	- ako servis ima vise implementacija, onda se svakoj dodaje odredjeni id 
+	- ako imamo vise implementacija onda ne mozemo koristiti anotaciju Autowired
+- treba napraviti konfiguracioni fajl, a ako radimo preko anotacija onda je to konfiguraciona klasa,
+sa odredjenom anotacijom  Configuration, prosledjuju joj se paketi s kojim ona rukuje 
+- ako se radi bez anotacija, onda se rucno navodi u config klasi, ali sa anotacijom Bean kod komponenti
+- Context - klase sluze za komunikaciju sa spring kontejnerom
+	- njemu se prosledi ime konfiguracione klase 
+	
+Autowired - springova anotacija, a ne javina 
+Inject - specificno kod jave za dependence injection
+
+Scope(value = name)
+-scope za svaku komponentu, ako se ne navede onda je singleton 
+	1. prototype - kad god se zatrazi novi objekat on ga napravi i prosledi onome ko je trazio
+	2. singleton - uvek dobijamo isti objekat sa istim vrednostima atributa
+			- to moze da se resi Proxy Modom : proxyMode = ScopedProxyMode.TARGET_CLASS
+			- prototype ubacimo u singleton sa ovim gore se to resava 
+Nacini konfiguracije:
+1. anotacije - objasnjeno gore 
+2. xml fajl  - registrovanje bean-ova sa tagom Bean uz navodjenje id, a  id = naziv klase sa prvim malim slovom 
+			 - property - ako se radi kroz seter
+			 - constructor -arg tag - ako se radi kroz konstruktor 
+	-poziva se pomocu ClassPathXmlApplicationContext - gde se kao parametar navodi xml fajl 
+	
+Da bi napravili spring aplikaciju minimum su nam potrebne dve biblioteke :
+	- core
+	- spring-context
+
+--SpringBoot---
+-brza konfiguracija projekta
+SpringBootApplication - SpringBoot je izgenerise, a ova anotacija sadrzi i Configuration, tako da ce ta klasa
+biti konfiguraciona 
+-Mana: ne zna se sta tacno radi 
+-SpringBootStarted - glavni dependency, mozemo i sami da ga izgenerismo ako se ode na sajt start.spring.io, 
+nece se znati u fajlu sta je dodato, tako da treba zapisati sta je sve sadrzano, da se zna za kasnije 
+-on nam uvuce tomcat 
+-u eclipsu treba instalirati plugin SpringBoot
+
+****VEZBE 3****
+ASPEKTI:
+- razlicite metode trigerujete pre ili posle neke druge metode 
+
+
+repository  - zaduzen za komunikaciju sa bazom 
+			- treba napisati  interfejse koji ce sadrzati sve metode koje su nam potrebne 
+			- ovaj sloj nije dostupan korisniku
+service 	- za razliku od repostitory metoda, dostupan je korisniku
+			- koristi podatke od baze
+			- ova dva sloja se povezuje dependence injection obrascem 
+controller  - prihvata sve nase zahteve 
+			- potrebno napraviti mapiranje za sva moguca mapiranja, to su urlovi
+			- front controller na osnovu urla zna koji kontroler ce da prosledi zahtev
+			- potrebno je metode grupisati prema tipovima korisnika ili radnjama koje trebaju da se obave 
+			- direktno komuniciraju sa servisima 
+			- a same metode hendluju zahteve 
+			- potrebno je prvo definisati tip zahteva: anotacijama ili request mapping (metod i nastavak urla)
+PRIKAZ PODATAKA:
+			- ModelAndView objekti zahtevaju da mu se prosledi view (neka jsp stranica) i model
+			- mozemo i da dodamo model i onda samo da vracamo jsp stranicu
+			- u application properties - ide sva konfiguracija oko baze i gde nam se nalaze svi 
+			view-ovi(jsp stranice)
+POST METODA:
+		- uz pomoc springa mozemo da formu pretvorimo u neki greeting, 
+		- najbitniji deo je modelAttribute, zato sto ce se sve iz forme prebaciti na taj model 
+		- kada se submituje mi u samoj metodi ocekujemo objekat prosledjenog tipa - submitovanje objekta
+Validacija:
+		- spring nudi tu mogucnost, gde mi u samom objektu mozemo da anotiramo atribute 
+		- mozemo da koristimo postojece anotacije ili da napravimo svoje
+		- treba samo u metodi koja preuzima podatke sa forme da dodamo anotaciju @Validate
+Promenljivi delovi url-a se navode u viticastim zagradama, anotiramo ih i napisemo koji je metod.
+ - pr. metoda deleteGreeting()
+za renderovanje jsp stranica potreban je dodatna biblioteka, a to moze da se resi promenom tomcat-a
+Target - sta sve zelimo da anotiramo 
+POST - menja podatke, koristi se za kreiranje
+PUT - je slican GETU, koristi se za izmenu, trazi tacnu lokaciju do objekta,
+ nema smisla za dodavanje zato sto id-u u bazi ne znamo unapred
+
+----------------------------------
+------- 4. vezbe -----------------
+KONEKCIJA SA BAZOM:
+	- resource folder - svi podaci o bazi, schema, data podaci, svi fajlovi sa ekstenzijom .sql
+	- unapred treba imati spremne podatke potrebne za aplikaciju !!OBAVEZNO!!
+	- za konekciju su potrebni konekcioni parametri, driver, url do baze, i ako baza ne postoji stiklirati na true da je napravi 
+	- napraviti model koji odgovara stanju u bazi, svaka tabela se mapira na klasu 
+	- PrepareStatement - najava bazi sta ce se kasnije proslediti, gde god se ne znaju parametri stavlja se ?
+		-sprecava sql injection 
+	- RowMapper za mapiranje tabele na model
+	- OBJEKTNO RELACIONI MAPERI:
+		- jpa - javina specifikacija za rad sa perzistetnim  podacima 
+		- hajbernet maper za svaku spring boot aplikaciju 
+		- mapiranju relacije,odnosno torke iz tabela na objekte
+		- repository paket sluzi za rad sa bazom, service - biznis logika 
+		- postoji mogucnost da maper kreira semu baze, pa nema schema.sql fajla koji
+		jje postojao u prethodnom primeru 
+		- svaka klasa se anotira sa @Entity - i ona ce biti tabela u bazi sa nazivom kao i klasa,
+		a moze da se doda i anotacija tabel koja menja naziv
+		- anotacija @Column iznad atributa, znaci da su oni kolone, 
+		kroz razlicite atribute u anotaciji mogu da se postave ogranicenja 
+		- kljuc se anotira sa @Id, koristiti bazine vestacke kljuceve, i anotirati ih i sa @GeneratedValue 
+		- ako se koriste prirodni kljucevi treba sve kolone koje ucestvuju u gradnji id-a anotirati 	
+		- strani kljuc - @ManyToOne i tako postoji i za ostale dve mogucnosti povezivanja tabela 1:M, M:1, M:N
+		- navodi se ceo objekat klase koja je referencirana 
+		---BIDIREKCIONE VEZE ---
+		-@OneToMany - set ili list kolekcija se koristi, mappedBy - navodi se koje valsnik veze, i na taj nacin se nece kreirati medju tabela, nego ce se u tabeli review kreirati strani kljuc od hotela 
+		- fetch atribut - LASY - sve sto je naznaceno se ne dobavlja, nego se dobavljaju samo osnovni i oni koji nisu naznaceni ili EAGER - dobavlja sve povezane podatke 
+		- cascade - za sve povezane entitete radi naznacenu akciju, voditi racuna koje operacije su dozvoljene za povezane entitete
+		- @ManyToMany - mora postojati u oba entiteta, kreirace se 2 dodatne tabele 
+		- za prijateljstva napraviti novu klasu
+		- KOMUNIKACIJA SA BAZOM:
+			- url, sema, komunikacioni parametri 
+			- u paketu repository 
+			- dovoljno je napraviti interface 
+			- u interface-u ako extendujemo Repository (prosledimo mu klasu, i kljuc) dovoljno je navesti samo metode, sa pageable ako ne zelimo sve elemente
+			- moze i da se anotira i sa @query, pa da se napise upit, ali nisu sql nego hajbernet upiti
+			- ako extendujemo JpaRepository - on ima sve potrebne metode
+			- sablon DAL - ja treba da napravim klasu ili interface gde cu da definisem sve metode koje smem da koristim za komunikaciju sa bazom
+			- sablon DTO - iz baze moze da se uzme samo ono sto se nalazi u tabeli, a treba vise podataka da prikazemo, ne moramo na klijentu saljemu sve povezane delove nego mozemo samo da iz potrebnih entiteta posaljemo samo potrebne podatke 
+			- show sql treba da bude true, dobro za debagovanje 
+			- OBAVEZNO!!!sema se kreira sa ddl-auto - create drop, svaki put kada se pokrene aplikacije kreira se sema, a kada iskljucimo app sema se izbrise,
+										 - update - samo ako ima promena menja se 
+			- dialect - nije obavezan, pomaze oko optimizacije baze !!!OPCIONO!!!
+	- u home xml, na sajt, stiklirano web, odgovarajuci driveri - mysql ili postgres i test
+
+---TESTIRANJE ---
+	- unit testovi - testiranje core funkcionalnosti
+	- integration testovi - testiraju komponente koje su povezane 
+	- sve sto je testira ide u src/java/test i ostalo se paketira kao i osnovna aplikacija
+	- anotacija SpringBootTest i RunWith
+	- jedan test - jedna metoda
+	- poziva se zeljena metoda, dobije se rezultat i poziva se odredjeni assert, svaki test treba da vrati true
+	- svaki test se ne zavisno izvrsava 
+	- anotacija Transactional - metoda se treba izvrsiti u transakcionom metodu 
+	- mogu da se prave i kontra testovi - metoda baca exception i to se navodi u anotaciji Test kao atribut
+	- kontroleri testiranje
+		- kao da se testira kroz browser, koristi se MockMvc(sluzi za razlicite upite, get, post, put) i WebApplicationContext
+
+---------------------------
+
+napraviti inicijalni git na repozitorijum, napraviti objektni model 
+
+---------------------------
+------ VEZBE 5. -----------
+-- MAPIRANJE NASLEDJIVANJA - ISA HIJERARHIJA
+	- zahteva da roditeljsku klasu i njene naslednice mapiramo na tabelu 
+	- STRATEGIJE:
+		1. jedna tabela za sve
+			- anotacija @Inheritance(strategy = SINGLE_TABLE)
+			- naslednice nemaju kljuc, nego samo roditeljska klasa
+			- da bi smo znali kog je tipa moramo dodati novu kolonu za ulogu, odnosno tip klase naslednice
+			- prednosti: jedna tabela , a to je ujedno i mana, nemamo joine pa  brze radi, dodavanje novog atributa se iskljucivo radi u jednoj tabeli
+			- mane: jedna tabela, zahtevi se uvek rade nad jednom tabelom, mora stalno da se posmatra uloga, dosta null vrednosti, ne citko, u celoj hijerarnhiji atributi moraju biti jedinstveni 
+			- sto se tice null vrednosti, baze nam nude optimizaciju u pozadini 
+			- moze da se koristi ako je jednostavnija hijerahija u pitanju 
+		2. tabela za svaku klasu naslednicu 
+			- anotacija @Inheritance(strategy = TABLE_PER_CLASS)
+			- postoji kljuc i u roditeljskoj i u klasama naslednicama 
+			- prednosti: nema join-ova, 
+			- mane: rucna implementacija problem, mora se voditi racuna o kljucevima, oni moraju biti jedinstveni na nivou cele hijerahije, a ne na nivou tabele
+					- promenom roditeljske klase, zahteva promenu svih tabela koje predstavljaju klase naslednice
+					- pretraga po id-u, moramo da prodjemo kroz sve tabele zato sto nzm u kojoj tabeli ce se naci taj kljuc
+			- 
+		3. za svaku klasu tabela 
+			- anotacija @Inheritance(startegy = JOINED)
+			- vise nemamo apstraktnu klasu, kao roditeljsku
+			- id-ovi isto kao kod 2.
+			- prednosti: svaka tabela ima podatke o klasi za koju se ti upiti prave 
+						- mapiranje 1 na 1, sto je ok 
+						- relacioni maperi ce sve to uraditi za nas, ali ako ih ne koristimo sami moramo raditi join-ove sto je problem
+			- mane: join-ovanje tabela, skupa operacija 
+					- veliki broj zahteva za jednu tabelu
+	- na jednom modelu moze da se koriste razlicite strategije 
+	- ako hijerahija ide vise od dubine 1 ne treba mesati strategije 
+	- kad god moze treba izbegavati nasledjivanje 
+	- mana: oslanjamo se na relacione mapere
+	- ako radimo rucno izbegavati nasledjivanje 
+	-u primeru verzija 1, je nasljedjivanje koje nije u sklopu stategija 
+		- u ovom nasledjivanju svaka klasa ima svoj id, nema problema oko jedinstvenosti na nivou cele hijerarhije
+
+ASINHRONO IZVRSAVANJE ZADATAKA
+	-ideja: svaki zahtev korisnika servis odobrava, ali u zavisnosti sta je operacija server ne mora momentalno da odradi  operaciju
+			- sa strane korisnika
+					- ako je neka operacija koja dugo traje, ako uradimo sinhrono- aplikacija ce se zalediti, frustrirano 
+					- operacija dugo traje ili se cesto obavlja - asinhrono izvrsavanje, kada aplikacija bude to mogla  da uradi 
+					-  mejla prilikom registracije, primer, na serverskoj strani se ne treba igrati tredovima,kao sto je radjeno u primeru 
+					- sto se tice mejla, moze se koristiti neki svoji, ili gmail, to se navodi u application.properties
+	- anotacija @Async
+	- potrebno je dozvoliti da manje bezbedne aplikacije mogu da koriste nas mejl i treba voditi racuna oko uredjaja
+	-u primeru prvi nacin je bolji 
+	
+KESIRANJE
+	- u primeru se koristi inmemory  bazu, tacnije h2 bazu, odlicna za testove, iz browser-a se pristupa njenom workbenchu  
+	- hajbernet podrazava 2 nivo hesiranja:
+		- l1 - na nivou hajbernet sesije, koja je obavezna prilikom njegovog koriscenja, 
+				- ako imamo vise poziva jedne metode, samo ce se jednom kontaktirati baza, a podaci se hesiraju i posle samo koriste u sledecim pozivima
+				- problem prilikom izmene izmedju dva poziva iste akcije 
+		- l2 - nije po default-u implementiran i ne dolazi u sastavu hajberneta
+			 - dobra stvar ako se prepozna da klijenti cesto trazi isti objekat, baza se kontaktira samo 1 i objekat se smesta u hash
+			 - potrebno je podesiti konfiguraciju za odredjeni provajder koji se koristi
+			 
+			 
+			 
+---------- VEZBE 6 -------------------- 18.04.2018.
+CONNECTION PULL
+	- potrebna je implementacija, potrebno je za svaku klasu izdvojiti u novu konfiguracionu klasu 
+	- svaka komponenta koju hocemo da registrujemo u spring kontejner ima Bean anotacija, a ne pripada kontroleru ili ostalim rezervisanim 
+	- koriscenje ovoga poboljsava performanse same aplikacije, u projekat bi trebalo ubaciti ovo 
+	- smanjivanjem connection pulla dobijaju se bolje performanse
+	- treba promeniti i data source, treba proveriti da li ta podesavanja rade, kao sto je dato u primeru 
+
+knjiga: High Performance Java Persistence - lepo sve objasnjeno, a pogotovu transkacije 
+!!!TRANSAKCIJE NAJBITNIJE ZA PROJEKAT!!!
+ 
+DOKUMENTOVANJE REST API
+	- napraviit dokumentaciju koja ce da posluzi frontendu da vidi kako sta radi 
+	- Swage biblioteka, zahteva konfiguracionu klasu, najbitniji je deo od 46 linije, a od toga svega putanja je najbitnija
+	- bitna je i 59 linija 
+	- svaka putanja pocinje sa ./api zato sto je u requestMappingu tako navedeno, linija 26
+	- moze da se iskoristi za kontrolne tacke ako se ne stigne da se uradi frontend, da se pokaze da to sto uradjeno radi 
+	- 63 i 70 linija dependecy ukljuciti i jedan i drugi 
+	- na kraju ovu dokumentaciju treba zabraniti ili iskljuciti podrsku za dokumentovanje 
+	
+WEB SOCKET
+	- nije obavezno za projekat, ali ga svi koriste zato sto lepo izgleda
+	- istovremeni prikaz na vise prozora, promena, real time komunikacija 
+	- drugi protokol,nije http, omogucava dvosmernu komunikaciju, imaju svoj standard, kako se vrsi komunikacija
+	- stranica se prijavi na odredjene dogadjaje i od servera dobija podatke kada se desi taj dogadjaj
+	- ne mora klijent da inicira komunikaciju, moze i server 
+	- statefull protokol
+	- u projektu zahtev za prijateljstvo, rezervacija mesta - ako jedan rezervise mesto svima to mesto pocrveni 
+	- problem statefull-su, a rest app je stateless
+	- u springu se ne koriste direktno, malo je zakomplikovano, ali to se ne odnosi na implementaciju
+	-MessageBroker - razmenjuje poruke
+	- 1. registrovati sve endpoint koje cemo gadjati / web socket url, 
+		- komunikacija se vrsi preko SockJS biblioteke, odradjeno zbog razlicitih verzija browser-a
+	  2. enable-ovati broker, linija 34, i potrebno je navesti tip komunikacije
+		- queue - FIFO komunikacija, moze 1 ili vise korisnika
+		- topic - svi koji se pretplate na to dobijaju poruku 
+		-u pr. su najcesce korisceni topic i queue
+	-ako sa klijenske strane saljemo poruku, moramo registovati app, linija 38
+	- imamo kontroler - i preko klasicnog http mozemo da preuzmemo poruku
+	- producer - prosledjuje poruke gde treba 
+	--drugi nacin za prihvatanje poruka - direktno preko sendMessage, 33 linija koda MessageMapping
+	-klijentska strana - sendMessage.html i testPage.html
+	--tipican primer je chat, najvise primera ima sa angularom
+	-misljenje asistenta: on ne bi koristio sockete, odradio bi ih na zahtevu za prijateljstvo i kod rezervacija za bojenje sedista, da je admin pregledao ponudu
+						- nije problem i ako se ne uradi, moze i da se stalno refreshuje njemu nije problem, bitno je da se izhendla sve na serversoj strani
+						- samo ako ostane vremena, ne da nam to bude glavni fokus
+	
+		- 
+	- 
+
+-------------------------------------------------------------------
+********************* VEZBE 7 ************************** 25.04.2018
+-------------------------------------------------------------------
+TRANSAKCIJE
+	- predstavljaju skup read/write operacija
+	- osobine:
+		- atomicnost - sve ili nista, proizvoljan broj operacija nad bazom moze da se nadje u 1 transkaciji,
+			- ideja ili se sve akcije  unutar akcije obave ili nijedna
+			- svaka baza ima transakcioni log gde zapisuje sta je uradjeno, odnosno stanja, i ako dodje do greske samo uradi rollback
+			- neke cak prave backapp pa samo vracaju na prethodno stanje 
+		- konzistetnost - kada se izvrse sve akcije, podaci u bazi moraju biti u konzistetnom stanju
+		- izolacija - najteze se postize,
+					- ideja: vise tredova obavlja transkacije mozda cak i nad istom tabelom, problem jedna transakcija cita podataka, druga menja podatak i onda neka druga cita i vidi druge podatke
+					- treba da se izvrsi izolacija podataka koji se koriste u transakacijama i onda ce one moci da menjaju podatke
+					- problemi:
+						- lost update - 2 paralelne transakcije, prva radi update, a druga isto to samo, jedan radi commit, a druga rollback
+						- dirty read - jedna menja, a druga cita podatak, i prva odradi rollback, sto znaci da druga nije ispravno procitala podatke
+						- unrepeatable read - u dva uzastopna citanja dobijaju se dva razlicita podatka
+						- phantom read - dva citanja sa  razlicitim podacima, zato sto je druga akcija u medjuvremenu uradila upis u bazu
+						
+					- nivoi izolacije - resavaju prethodne probleme:
+						- serializable - phantom read resava - performanse ocajne, zato sto se u 1 trenutku obavlja samo 1 transkacija
+						- repetable_read - unrepeatable read - 
+						- read_committed - dirty read
+						- read_uncommitted - lost update
+		- probabiliti - kada se zavrsi operacije i dalje imamo podatke, u slucaju da zavrsimo transakciju a servis pukne
+			- promena se nije zabelezila na servisu, mora se odrzati neko realno stanje,
+			
+KAKO OVO URADITI?
+1. proveriti koji nivo izolacije koristi baza
+2. transakcije se rade u metodama servica
+3. anotacija @Transactional iznad metode ili klase, ako je iznad klase vazi za sve metode, a ako iznad metode onda samo za tu metodu
+	- ulaskom u metodu pocinje transakcija, a zavrsava se u poslednjoj, ako prodje akcija on radi commit, a ako ne rollback
+	- ima nekoliko atributa:
+		- readOnly=true - samo citanje, mozemo da dobijemo bolje performanse, optimizacija u pozadini
+		- readOnly=false - ako se cuvaju podaci, stavimo iznad metode
+		- timeOut - pri pozivu svake metode okinuce timer, ako traje duze odradice rollback
+		- rollbackFor i norollbackFor
+		- propagation - 7 potencijalnih vrednost, vise razlicitih metoda 1 transakcija
+		-kako ce se transakcija izvrsiti:
+			-required - gleda da li postoji aktivna transakcija i ako postoji pridruzice joj se
+			-required _new - uvek pravi novu transakciju
+			...
+-long conversation - kada ne moze cela operacija da se izvrsi u jednoj transakciji
+-pr. dva klijenta otvaraju istu stranicu i hoce da rezervisu isto mesto
+	- default - onaj koji poslednji dodje napravice poslednju promenu i ona ce biti vidljiva, nama treba obrnuto ko prvi dodje
+	-resavanje:
+		- pesimisticko zakljucavanje - prvi koji dodje do resursa zakljuca ga, a oni posle cekaju da se oslobodi
+									- skupa operacija, ali laka za odraditi
+									- grantovanje da ce u jednom trenutku samo jedan moci da menja podatke
+		- optimisticko zakljucivanje - nije zakljucavanje, vec detekcija konflikta, nada se da nece doci do konflikta, ako dodje detektuje komflikt i jednom dozvoljava da obavi transakciju
+					- kako detektovati da postoji konflikt: 
+						- pr. admin preuzme detekciju oglasa
+						- upucivanjem zahteva na server treba proveriti da li je admin vec null ili ne
+						- proveravamo sve podatke i trazimo onaj koji je promenjen u odnosu na ono sto drugi korisnik vidi - to treba ishendlati
+						**drugi nacin
+						- bitno je znati da se kolona samo promenila, a ne i koja 
+						- jednostavnije proveriti samo jednu kolonu, ideja dodati novu klonu timestamp, i onda samo ocitati to
+						- problem sinhronizacija sata 
+						**treci nacin
+						- umesto timestampa, brojac i svakom izmenom povecati brojac 
+						- u tabeli dodati novu kolonu i anotirati sa @Version, i samu proveru radi hajbernet i ako su iste verzije uradice promenu,a ako ne bacice exception i samo je potrebno ishendlati ono sto on vrati 
+						- verzija se automatski povecava, pri svakom save ili update-u
+						-----
+						- u servisu samo ishendlati ili u kontroleru, posto tu mozemo odmah korisniku da vratimo poruku o gresci
+					
+-provera oglasa admina - optimisticko zakljucavanje
+-ponuda za oglas prihvacena - optimisticko
+-rezervacija mesta - zavisi od modela, pesimisticko mozda 
+-iste karte na popustu - optimisticko
+@EnableTransactionManager- na nivou cele aplikacije 
+		
+			
+-----------------------------------------------------------------
+------------------- VEZBE 8 -------------------------- 9.05.2018.
+MESSAGE QUEUE
+	- dve aplikacije koje komuniciraju porukama 
+	- protokol, gde se salju poruke i format poruke  
+	
+-prednosti:
+	1. capling - ideja da odredjene service mozemo da izdvojimo, pa mozemo da se posvetimo nezavisnom razvoju
+	2. redudantnost 
+		- problem ovakvih app - dosta stvari se cuva u memoriji 
+		- mogu kod sebe na disku da cuvaju poruke 
+	3. skalabilnost 
+		- jednostavnije skaliranje zbog nezavisnih servisa
+	4. elasticnost
+		- odnosi se kada imaju pikovi u aplikaciji, npr, kada nemamo konstantno koriscenje aplikacije
+			- treba odrediti jacinu servera da bi izdrzao komunikaciju 
+		- u trenucima navale korisnika sve poruke u tom periodu prosledjivati i pamtiti kroz message queue
+	5. sigurna dostava poruka 
+	6. garantuju isporuku - sve sto dodje u queue ce i otici iz njih 
+	7. ordering - queue FIFO
+	8. bafering - 
+	9. asinhrona komunikacija
+	
+-ima dosta implementacija i svaka ima neki protokol sa kojim radi 
+-u primeru je koriscen rabbitxtmq
+-----------------------------------------------------------------
+---------------- VEZBE 9 ---------------------------- 16.05.2018.
+-----------------------------------------------------------------
+Heroku
+-uploada fajlova i googl mape ako ne budu radile na diplojdu nije problem, bitno je da rade u lokalu
+-baza ako ne bude radila preci na h2
+-treba u lokalu dodati postgres driveri, zato sto je heroklu daje besplatno 
+-ako se bude rradilo sa posgre bazom treba promeniti ssl na true 
+
+Continues Integration Server
+-treba povezati aplikaciju 
+-svaka aplikacija dobije svoju virtualnu masinu 
+-ideja: da imamo potpuno nezavisan sistem na kojem pokrecemo app i ako tamo radi onda je sve ok, provera rada programa bez dodatnih konfiguracija
+- svaki push na git ide i na cis, i ako prodje diplojment dobija je success, a ako ne failed
+- moguca medjusobna kontrola 
+- sve sto se okaci se testira 
+- circleci.com - csi na koju mozemo  da se povezemo, moze i private i public repozitorijumi 
+-samo sci povezati sa gitom 
+
+Spring security
+- nije obavezno ga koristiti
+- jwt

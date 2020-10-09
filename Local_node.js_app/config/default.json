@@ -1,0 +1,17 @@
+{
+  "LocalServer": {
+    "CentralServer": {
+      "address": "127.0.0.1",
+      "addressFTP": "0.0.0.0",
+      "restApiPort": 5984
+    },
+    "user": {
+      "username": "stefan",
+      "password": "mijat",
+	  "dir": "direktorijum",
+    "dirSizeGb": 55,
+    "myPath": "C:\\Users\\marko\\files",
+    "downloadPath": "C:\\Users\\marko\\filesBacup"
+    }	
+  }
+}

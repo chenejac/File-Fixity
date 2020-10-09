@@ -1,0 +1,33 @@
+@RequestMapping(value ="/add", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity addScientificPaper(@RequestParam("processInstanceId") String processInstanceId,
+                                            @RequestPart("scientific_paper_file") MultipartFile file,
+                                            @RequestPart("scientific_paper_data") ScientificPaperDTO scientificPaperDTO) {
+        UserData loggedUser = null;
+        try {
+            loggedUser = userService.getLoggedUser();
+        } catch (Exception e) {
+            new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (file == null || scientificPaperDTO == null) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+
+        Map<String, Object> formFieldsMap = new HashMap<String, Object>();
+        formFieldsMap.put("title", scientificPaperDTO.getTitle());
+        formFieldsMap.put("coauthors", scientificPaperDTO.getCoauthors());
+        formFieldsMap.put("keywords", scientificPaperDTO.getKeywords());
+        formFieldsMap.put("abstract", scientificPaperDTO.getScientificPaperAbstract());
+        formFieldsMap.put("selectedScientificAreaId", scientificPaperDTO.getScientificAreaId());
+        formFieldsMap.put("fileName", file.getName());
+
+
+        try {
+            scientificPaperService.submitFirstUserTask(loggedUser.getCamundaUserId(), processInstanceId, formFieldsMap);
+        } catch (NotFoundException | TaskNotAssignedToYouException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity(HttpStatus.CREATED);
+    }
