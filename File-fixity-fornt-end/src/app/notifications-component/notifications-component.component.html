@@ -1,0 +1,7 @@
+Prikazati ako ima notifikacija<br>
+
+<ul>
+    <li *ngFor="let u of notificationFromUsers">
+       {{ u }} <br><button (click)="accept(1 , u)">Prihvati</button><br><button (click)="accept(0, u)">Odbij</button>
+    </li>
+  </ul>
