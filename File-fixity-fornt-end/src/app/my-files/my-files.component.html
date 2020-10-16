@@ -8,7 +8,7 @@
 
   <body>
     <header class="header">
-      <h2 href="#">Notifications</h2>
+      <h2 href="#">My files</h2>
       <nav>
         <li><a routerLink="/home">Home</a> </li>
       </nav>
@@ -16,18 +16,14 @@
 
     <section class="hero">
       <div class="background-image"></div>
-      <div class="hero-content-area">
-Prikazati ako ima notifikacija<br>
-<br>
-
-<ul>
-    <li *ngFor="let u of notificationFromUsers">
-       {{ u }} <a href="home" class="btn" (click)="accept(1 , u)">Prihvati</a><a href="home" class="btn" (click)="accept(0, u)">Odbij</a>
-    </li>
-  </ul>
-</div>
-</section>
-  </body>
-
+                <div class="hero-content-area">
+    <select class='custom-select' size="15" [(ngModel)]="selectedMyFiles">
+        <option *ngFor="let myf of myFiles">
+            {{myf}}
+        </option>
+    </select><br>
+  </div>
+  </section>
+    </body>
+  
 </html>
-

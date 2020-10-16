@@ -9,17 +9,27 @@ import { HttpServices } from './services/http.service';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NotificationsComponentComponent } from './notifications-component/notifications-component.component';
+import { HomeComponent } from './home/home.component';
+import { MyFilesComponent } from './my-files/my-files.component';
+import { SendRequestComponent } from './send-request/send-request.component';
 
 const routes: Routes = [
-  { path: "", component: FilesComponentComponent },
-  { path: "notifications", component: NotificationsComponentComponent }
+  // { path: "", component: FilesComponentComponent },
+  { path: "", component: HomeComponent },
+  { path: "home", component:HomeComponent },
+  { path: "notifications", component: NotificationsComponentComponent },
+  { path: "myfiles", component: MyFilesComponent },
+  { path: "sendRequest", component: SendRequestComponent }
 ]
 
 @NgModule({
   declarations: [
     AppComponent,
     FilesComponentComponent,
-    NotificationsComponentComponent
+    NotificationsComponentComponent,
+    HomeComponent,
+    MyFilesComponent,
+    SendRequestComponent
   ],
   imports: [
     BrowserModule,

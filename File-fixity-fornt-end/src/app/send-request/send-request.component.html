@@ -8,7 +8,7 @@
 
   <body>
     <header class="header">
-      <h2 href="#">Notifications</h2>
+      <h2 href="#">Send request</h2>
       <nav>
         <li><a routerLink="/home">Home</a> </li>
       </nav>
@@ -16,16 +16,18 @@
 
     <section class="hero">
       <div class="background-image"></div>
-      <div class="hero-content-area">
-Prikazati ako ima notifikacija<br>
-<br>
-
-<ul>
-    <li *ngFor="let u of notificationFromUsers">
-       {{ u }} <a href="home" class="btn" (click)="accept(1 , u)">Prihvati</a><a href="home" class="btn" (click)="accept(0, u)">Odbij</a>
-    </li>
-  </ul>
-</div>
+                <div class="hero-content-area">
+        <p>Korisnici:</p>
+        <div class="hideoverflow">
+          <select  class='custom-select'  size="15" [(ngModel)]="selectedUser" (change)='onOptionsSelected(selectedUser)'>
+            <option *ngFor="let s of users">
+              {{s.name}} 
+            </option>
+          </select><br>
+        </div>
+        <!-- <br><button (click)="getFilesFromUser()" >Fajlovi korisnika</button><br> -->
+        <br><a href="home" class="btn" (click)="sendRequestForFileSharing()" >Deli</a><br>
+    </div>
 </section>
   </body>
 

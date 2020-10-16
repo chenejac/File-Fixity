@@ -1,29 +1,73 @@
-<div class="row">
-
-  <div class="column">
-      <p>Korisnici:</p>
-      <div class="hideoverflow">
-      <select size="15" [(ngModel)]="selectedUser" (change)='onOptionsSelected(selectedUser)'>
+<!-- <table class="center">
+  <tr>
+    <th>
+      <p>Korisnici</p><br>
+      <select size="15"  [(ngModel)]="selectedUser" (change)='onOptionsSelected(selectedUser)'>
         <option *ngFor="let s of users">
-          {{s.name}} 
+          {{s}} 
         </option>
       </select><br>
-    </div>
-      <!-- <br><button (click)="getFilesFromUser()" >Fajlovi korisnika</button><br> -->
-      <br><button (click)="sendRequestForFileSharing()" >Deli</button><br>
+
       <br><button (click)="getMyFiles()" >Moji fajlovi </button><br>
-    </div>
-    <div class="column">
+    </th>
+  
+    <th>
+      
+        <p>Fajlovi risnika: {{selectedUser}}</p><br>
+      
+        <select size="15" multiple [(ngModel)]="selectedFiles">
+          <option *ngFor="let f of selectedUserFiles">
+            {{f}}
+          </option>
+        </select><br>
+        <br><button (click)="sendRequestForFileSharing()" >Zahtev za deljenje</button><br>
+        
+      </th>
+
+  </tr>
+  <tr>
+    <div>
+      <p>Moji fajlovi</p>
+      {{myFiles}}
+     </div>
+  </tr>
+</table> -->
+<html>
+
+  <body>
+    <header class="header">
+      <h2 href="#"> File backup</h2>
+      <nav>
+        <li><a href="#">Home</a> </li>
+      </nav>
+    </header>
+    
+    <div class="row">
+      
+      <div class="column">
+        <p>Korisnici:</p>
+        <div class="hideoverflow">
+          <select    size="15" [(ngModel)]="selectedUser" (change)='onOptionsSelected(selectedUser)'>
+            <option *ngFor="let s of users">
+              {{s.name}} 
+            </option>
+          </select><br>
+        </div>
+        <!-- <br><button (click)="getFilesFromUser()" >Fajlovi korisnika</button><br> -->
+        <br><button (click)="sendRequestForFileSharing()" >Deli</button><br>
+        <br><button (click)="getMyFiles()" >Moji fajlovi </button><br>
+      </div>
+      <div class="column">
         <p>Fajlovi risnika: {{selectedUser}}</p>
         <div class="hideoverflow">
-          <select size="15" multiple [(ngModel)]="selectedFiles">
+          <select  size="15" multiple [(ngModel)]="selectedFiles">
             <option *ngFor="let f of selectedUserFiles">
               {{f}}
             </option>
           </select><br>
         </div>
       </div> 
-
+      
       <div>
         <button (click)="showRequests()">Novi zahtevi</button>
         <br>
@@ -31,15 +75,17 @@
           <app-notifications-component></app-notifications-component>
         </div>
       </div>
-</div>
+    </div>
     <div>
       <br>
       <div class="hideoverflow">
-        <select size="15" [(ngModel)]="selectedMyFiles">
+        <select  size="15" [(ngModel)]="selectedMyFiles">
           <option *ngFor="let myf of myFiles">
             {{myf}}
           </option>
         </select><br>
       </div>
-     </div>
-
+    </div>
+  </body>
+  
+  </html>
